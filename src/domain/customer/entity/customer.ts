@@ -1,6 +1,8 @@
+import Entity from "../../@shared/entities/entity";
+import NotificationError from "../../@shared/notifications/notification.error";
 import Address from "./address";
 
-export default class Customer {
+export default class Customer extends Entity {
     private address!: Address;
     private active: boolean = true;
     private rewardPoints: number = 0;
@@ -9,20 +11,28 @@ export default class Customer {
         private id: string,
         private name: string,
     ) {
+        super();
+
         this.validate()
+
+        if (this.notification.hasErrors()) {
+            throw new NotificationError(this.notification.getErrors());
+        }
     }
 
     validate() {
         if (this.name.length === 0) {
-            throw new Error('Name is required');
+            this.notification.addError({
+                message: 'Name is required',
+                context: 'customer'
+            });
         }
 
         if (this.id.length === 0) {
-            throw new Error('Id is required');
-        }
-
-        if (!this.active) {
-            throw new Error('Customer is not active');
+            this.notification.addError({
+                message: 'Id is required',
+                context: 'customer'
+            });
         }
 
         return true;
