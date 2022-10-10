@@ -2,6 +2,7 @@ import { Router } from "express";
 import { CreateCustomerUseCase } from "../../../use-case/customer/create/create-customer.use-case";
 import ListCustomerUseCase from "../../../use-case/customer/list/list-customer.use-case";
 import CustomerRepository from "../../customer/repositories/sequelize/customer.repository";
+import CustomerPresenter from "../presenters/customer.presenter";
 
 export const customerRoute: Router = Router();
 
@@ -35,7 +36,10 @@ customerRoute.get("/", async (req, res) => {
 
         const output = await listCustomersUseCase.execute({});
 
-        res.status(200).json(output);
+        res.format({
+            json: async () => res.send(output),
+            xml: async () => res.send(CustomerPresenter.toXml(output)),
+        });
     } catch (err) {
         res.status(500).send(err);
     }
